@@ -1,0 +1,8 @@
+pandas
+numpy
+tensorflow
+pillow
+scipy
+matplotlib
+scikit-image
+lime
