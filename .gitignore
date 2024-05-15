@@ -3,3 +3,4 @@ xaienv/
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 VietNam_Medicinal_Plant/
+__pycache__/
