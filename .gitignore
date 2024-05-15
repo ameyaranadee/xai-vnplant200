@@ -31,3 +31,6 @@ xaienv/
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 VietNam_Medicinal_Plant/
+xai-v1.ipynb
+xai-v2.ipynb
+plots/
