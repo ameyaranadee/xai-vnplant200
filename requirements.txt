@@ -6,3 +6,5 @@ scipy
 matplotlib
 scikit-image
 lime
+flask
+scikit-image

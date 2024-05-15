@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Explainable Approach for Species Identification</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h3>Explainable Approach for Species Identification</h3>
+    <div>
+        <p>This research explores deep learning techniques such as InceptionV3, Xception, and ResNet for plant identification, which has applications in agronomy and the discovery of natural and medicinal products. 
+            While highly accurate machine learning models lack explainability, we aim to address this issue by incorporating Explainable AI (XAI) techniques like LIME and SHAP.</p>
+        <h6>Understanding how <a href="https://github.com/marcotcr/lime">LIME</a> (<b><u>L</u></b>ocal <b><u>I</u></b>nterpretable <b><u>M</b></u>odel-agnostic <b><u>E</u></b>xplanations) works</h6>
+        <p>LIME is an explainability technique used after training any machine learning model. It treats the trained model like an API, taking an example instance and producing a prediction. 
+            To explain why the model makes a certain prediction for a given input, LIME perturbs the input instance by making small changes at the feature level, such as modifying images, pixels, or pixel regions. It then observes how the model's predictions change with these perturbations.</p>
+        <p>To implement LIME, two key components are involved: </p>
+            <ul>
+                <li>Generating perturbations of the input image</li>
+                <li>Measuring the model's prediction changes on these perturbations. </li>
+            </ul>
+        <p>LIME subdivides the input image into interpretable components called <b>superpixels</b>, which are similarity-based groupings of individual pixels. These superpixels represent the interpretable components of the image, highlighting the pixels or pixel regions that most influence the model's prediction. </p>
+        <p> Let's create these "superpixels" using different segmentation algorithms.</p>
+        <h6>Image with option to change ratio for quickshift and it should show changes</h6>
+        <div class="row">
+          <div class="col-md-1"></div>
+          <div class="col-md-5">
+            <img id="original-image" src="{{ url_for('static', filename='5.JPG') }}" class="img-fluid">
+          </div>
+          <div class="col-md-5">
+            <img id="segmented-image-ratio" src="" alt="Segmented Image (Ratio)" class="img-fluid">
+          </div>
+          <div class="col-md-1 slider-container">
+            <label for="ratio-input" class="form-label">Ratio:</label>
+            <input type="range" id="ratio-input" min="0" max="1" step="0.1" value="1" class="vertical-slider form-range">
+          </div> 
+        </div>
+        <h6>Image with option to change max_dist for quickshift and it should show changes</h6>
+        <h5>Integrating explainability using LIME</h5>
+        <p>Insert predict button to predict class of the input leaf image</p>
+        <h6>Image with option to change params in masking - positive_only (T/F), num_features (0-10), hide_rest (T/F)</h6>
+        <h6>Show distinction in which features are highlighted for 1st and 2nd prediction</h6>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Load the initial segmentation results
+      loadSegmentationResults(1.0);
+
+      // Event listener for the ratio input
+      $('#ratio-input').on('input', function() {
+        const ratio = $(this).val();
+        loadSegmentationResults(ratio);
+      });
+    });
+
+    function loadSegmentationResults(ratio) {
+      $.ajax({
+        url: '/segmentation',
+        data: { ratio: ratio },
+        success: function(data) {
+          $('#original-image').attr('src', `data:image/png;base64,${data[0]}`);
+          $('#segmented-image-ratio').attr('src', `data:image/png;base64,${data[1]}`);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

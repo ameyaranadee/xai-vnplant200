@@ -1,0 +1,49 @@
+body {
+  font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  margin: 0 120px;
+  padding: 0 120px;
+}
+
+.container {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 28px;
+  color: #333;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  height: 200px; /* Adjust the height as needed */
+}
+
+.vertical-slider {
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
+  height: 150px;
+  margin-left: 10px;
+  width: 10px; /* Adjust the width as needed */
+}
+
+.vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px; /* Adjust the width of the thumb */
+  height: 15px; /* Adjust the height of the thumb */
+  background-color: #007bff; /* Change the color of the thumb */
+  border-radius: 50%; /* Make the thumb circular */
+  cursor: pointer;
+}
+
+.vertical-slider::-moz-range-thumb {
+  width: 15px; /* Adjust the width of the thumb */
+  height: 15px; /* Adjust the height of the thumb */
+  background-color: #007bff; /* Change the color of the thumb */
+  border-radius: 50%; /* Make the thumb circular */
+  cursor: pointer;
+}
