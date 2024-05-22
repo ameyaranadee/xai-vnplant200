@@ -16,6 +16,11 @@ h1 {
   color: #333;
 }
 
+#original-image{
+  width: 8cm;
+  height: 8cm;
+}
+
 .slider-container {
   display: flex;
   align-items: center;

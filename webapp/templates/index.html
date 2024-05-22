@@ -28,7 +28,7 @@
             <img id="original-image" src="{{ url_for('static', filename='5.JPG') }}" class="img-fluid">
           </div>
           <div class="col-md-5">
-            <img id="segmented-image-ratio" src="" alt="Segmented Image (Ratio)" class="img-fluid">
+            <img id="segmented-image-ratio" src="" alt="Segmented Image (ratio)" class="img-fluid">
           </div>
           <div class="col-md-1 slider-container">
             <label for="ratio-input" class="form-label">Ratio:</label>
@@ -36,36 +36,37 @@
           </div> 
         </div>
         <h6>Image with option to change max_dist for quickshift and it should show changes</h6>
+        <div class="row">
+          <div class="col-md-1"></div>
+          <div class="col-md-5">
+            <img id="original-image" src="{{ url_for('static', filename='5.JPG') }}" class="img-fluid">
+          </div>
+          <div class="col-md-5">
+            <img id="segmented-image-max-dist" src="" alt="Segmented Image (max_dist)" class="img-fluid">
+          </div>
+          <div class="col-md-1 slider-container">
+            <label for="max-dist-input" class="form-label">Max distance:</label>
+            <input type="range" id="max-dist-input" min="10" max="100" step="10" value="10" class="vertical-slider form-range">
+          </div> 
+        </div>
         <h5>Integrating explainability using LIME</h5>
-        <p>Insert predict button to predict class of the input leaf image</p>
+        <p>Upload leaf image</p>
+        <div>
+          <input type="file" id="image-input" accept="image/*" onchange="generateLimeExplanation(event)">
+        </div>
+        <div>
+          <img id="uploaded-image" src="" alt="Uploaded Image" style="display: none;">
+        </div>
+        <div id="explanation-result"></div>
+        <div>
+          <img id="explanation-image" src="" alt="Explanation Image">
+        </div>
         <h6>Image with option to change params in masking - positive_only (T/F), num_features (0-10), hide_rest (T/F)</h6>
         <h6>Show distinction in which features are highlighted for 1st and 2nd prediction</h6>
     </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      // Load the initial segmentation results
-      loadSegmentationResults(1.0);
-
-      // Event listener for the ratio input
-      $('#ratio-input').on('input', function() {
-        const ratio = $(this).val();
-        loadSegmentationResults(ratio);
-      });
-    });
-
-    function loadSegmentationResults(ratio) {
-      $.ajax({
-        url: '/segmentation',
-        data: { ratio: ratio },
-        success: function(data) {
-          $('#original-image').attr('src', `data:image/png;base64,${data[0]}`);
-          $('#segmented-image-ratio').attr('src', `data:image/png;base64,${data[1]}`);
-        }
-      });
-    }
-  </script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </body>
 </html>
