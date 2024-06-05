@@ -49,7 +49,7 @@ def get_segmentation():
     
     # Convert the segmentation results to base64-encoded images
     segmentation_data = []
-    for segment in [segments, segments1]:
+    for segment in [train_image_orig, segments, segments1]:
         fig, ax = plt.subplots(figsize=(4, 4))
         ax.imshow(segment)
         ax.axis('off')
@@ -86,6 +86,10 @@ def explain():
     temp, mask = explanation.get_image_and_mask(explanation.top_labels[0], positive_only=True, num_features=5, hide_rest=False)
     explanation_image = mark_boundaries(temp / 2 + 0.5, mask)
     
+    fig, ax = plt.subplots(figsize=(4, 4))
+    ax.imshow(segment)
+    ax.axis('off')
+
     # Convert the explanation image to base64
     buffer = io.BytesIO()
     plt.imsave(buffer, explanation_image, format='png')

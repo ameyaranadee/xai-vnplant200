@@ -21,57 +21,13 @@ $(document).ready(function() {
       url: '/segmentation',
       data: { ratio: ratio, max_dist: max_dist },
       success: function(data) {
-        $('#segmented-image-ratio').attr('src', `data:image/png;base64,${data[0]}`);
-        $('#segmented-image-max-dist').attr('src', `data:image/png;base64,${data[1]}`);
+        $('#original-image').attr('src', `data:image/png;base64,${data[0]}`);
+        $('#segmented-image-ratio').attr('src', `data:image/png;base64,${data[1]}`);
+        $('#segmented-image-max-dist').attr('src', `data:image/png;base64,${data[2]}`);
       }
     });
   }
 
-//   function displayUploadedImage(event) {
-//     const imageInput = event.target;
-//     const imageFile = imageInput.files[0];
-  
-//     if (!imageFile) {
-//       alert('Please select an image file.');
-//       return;
-//     }
-  
-//     const reader = new FileReader();
-//     reader.onload = function() {
-//       $('#uploaded-image').attr('src', reader.result);
-//       $('#uploaded-image').show();
-//       $('#predict-button').prop('disabled', false);
-//     }
-//     reader.readAsDataURL(imageFile);
-//   }
-  
-//   $('#predict-button').click(function() {
-//     const imageInput = $('#image-input')[0];
-//     const imageFile = imageInput.files[0];
-  
-//     if (!imageFile) {
-//       alert('Please select an image file.');
-//       return;
-//     }
-  
-//     const formData = new FormData();
-//     formData.append('image', imageFile);
-  
-//     $.ajax({
-//       url: '/predict',
-//       type: 'POST',
-//       data: formData,
-//       processData: false,
-//       contentType: false,
-//       success: function(data) {
-//         const predictedClass = data.predicted_class;
-//         $('#prediction-result').text(`Predicted Class: ${predictedClass}`);
-//       },
-//       error: function() {
-//         alert('An error occurred during prediction.');
-//       }
-//     });
-//   });
 
 function generateLimeExplanation(event) {
     const imageInput = event.target;

@@ -16,39 +16,132 @@ h1 {
   color: #333;
 }
 
-#original-image{
-  width: 8cm;
-  height: 8cm;
+#ratio-input{
+  margin-left: 15px;
+  width: 225px;
+}
+
+#max-dist-input{
+  margin-left: 15px;
+  width: 170px;
 }
 
 .slider-container {
   display: flex;
   align-items: center;
-  height: 200px; /* Adjust the height as needed */
+  width: 100cm;
+  margin-top: 15px;
+  margin-bottom: 20px;
 }
 
-.vertical-slider {
-  writing-mode: bt-lr;
-  -webkit-appearance: slider-vertical;
-  height: 150px;
-  margin-left: 10px;
-  width: 10px; /* Adjust the width as needed */
+.row {
+  margin-top: 30px;
 }
 
-.vertical-slider::-webkit-slider-thumb {
+.img-fluid {
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-in-out;
+}
+
+.img-fluid:hover {
+  transform: scale(1.05);
+}
+
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 15px; /* Adjust the width of the thumb */
-  height: 15px; /* Adjust the height of the thumb */
-  background-color: #007bff; /* Change the color of the thumb */
-  border-radius: 50%; /* Make the thumb circular */
+  width: 20px;
+  height: 20px;
+  background-color: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background-color: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+input[type="range"]::-ms-thumb {
+  width: 20px;
+  height: 20px;
+  background-color: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+input[type="range"]::-ms-track {
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  background-color: #0056b3;
+}
+
+input[type="range"]:hover::-moz-range-thumb {
+  background-color: #0056b3;
+}
+
+input[type="range"]:hover::-ms-thumb {
+  background-color: #0056b3;
+}
+
+input[type="range"]:hover::-webkit-slider-runnable-track {
+  background-color: #bbb;
+}
+
+input[type="range"]:hover::-moz-range-track {
+  background-color: #bbb;
+}
+
+input[type="range"]:hover::-ms-track {
+  background-color: #bbb;
+}
+
+.bordered-row {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.custom-file {
+  width: 300px;
+}
+
+.custom-file-input {
   cursor: pointer;
 }
 
-.vertical-slider::-moz-range-thumb {
-  width: 15px; /* Adjust the width of the thumb */
-  height: 15px; /* Adjust the height of the thumb */
-  background-color: #007bff; /* Change the color of the thumb */
-  border-radius: 50%; /* Make the thumb circular */
-  cursor: pointer;
+.custom-file-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rounded {
+  border-radius: 5px;
 }
