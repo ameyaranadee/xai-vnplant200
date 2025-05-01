@@ -26,6 +26,9 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+*.DS_Store
+.DS_store
+
 inceptionv3/
 xaienv/
 .ipynb_checkpoints

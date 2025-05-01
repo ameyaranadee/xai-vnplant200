@@ -8,3 +8,8 @@ scikit-image
 lime
 flask
 scikit-image
+torch
+timm
+torchvision
+opencv-python
+gradcam

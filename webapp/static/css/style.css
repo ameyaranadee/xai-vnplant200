@@ -36,6 +36,7 @@ h1 {
 
 .row {
   margin-top: 30px;
+  margin-bottom: 20px;
 }
 
 .img-fluid {
@@ -126,6 +127,7 @@ input[type="range"]:hover::-ms-track {
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 20px;
+  padding-bottom: 10px;
 }
 
 .custom-file {
@@ -144,4 +146,26 @@ input[type="range"]:hover::-ms-track {
 
 .rounded {
   border-radius: 5px;
+}
+
+.loader {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite;
+  display: none;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#lime-params {
+  display: none;
+  max-width: 300px;
+  margin: auto;
 }

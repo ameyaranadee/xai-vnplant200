@@ -1,81 +1,24 @@
-from flask import Flask, render_template, jsonify, request
+import io
+import base64
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from skimage.segmentation import quickshift
-import io
-import base64
-import skimage.io
-import skimage.transform
-import numpy as np
+from PIL import Image
+from flask import Flask, render_template, jsonify, request
 import tensorflow as tf
-from tensorflow.keras.models import load_model
-import lime
-from lime import lime_image
-from skimage.segmentation import mark_boundaries
 
-class ImageModel:
-    def __init__(self, model_path):
-        self.model = load_model(model_path)
-    
-    def transform_img(self, img):
-        img = skimage.transform.resize(img, (150, 150))
-        img = (img - 0.5) * 2
-        img = np.expand_dims(img, axis=0)
-        return img
-    
-    def load_image(self, image_data):
-        # Load image from the image data
-        image_file = io.BytesIO(image_data)
-        image = skimage.io.imread(image_file)
-        return image
-
-    def predict(self, img):
-        return self.model.predict(img)
-
-class LimeExplainer:
-    def __init__(self, model):
-        self.model = model
-    
-    def explain(self, img):
-        # Create the LIME explainer
-        explainer = lime_image.LimeImageExplainer()
-        
-        # Generate the LIME explanation
-        explanation = explainer.explain_instance(img[0].astype('double'), self.model.predict, top_labels=3, hide_color=0, num_samples=1000)
-        
-        # Get the predicted class
-        predicted_class = explanation.top_labels[0]
-        
-        # Generate the explanation image
-        temp, mask = explanation.get_image_and_mask(explanation.top_labels[0], positive_only=True, num_features=5, hide_rest=False)
-        explanation_image = mark_boundaries(temp / 2 + 0.5, mask)
-
-        return predicted_class, explanation_image
-
-class Segmentation:
-    @staticmethod
-    def apply_quickshift(image, ratio, max_dist):
-        segments_ratio = quickshift(image, ratio=ratio)
-        segments_max_dist = quickshift(image, max_dist=max_dist)
-        return [image, segments_ratio, segments_max_dist]
-
-    @staticmethod
-    def image_to_base64(image):
-        fig, ax = plt.subplots(figsize=(4, 4))
-        ax.imshow(image)
-        ax.axis('off')
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', bbox_inches='tight')
-        img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-        plt.close(fig)
-        return img_base64
+from webapp.utils import vit_transform
+from webapp.models import InceptionModel, VisionTransformerModel
+from webapp.explainers import LimeExplainer, GradCamExplainer
+from webapp.segmentation import Segmentation
 
 app = Flask(__name__, template_folder='templates')
 
-# Load the model from the 'inceptionv3' directory
-inceptionv3_model = ImageModel('../models/inceptionv3')
-explainer = LimeExplainer(inceptionv3_model)
+# initialize models and explainers
+inceptionv3_model = InceptionModel('../models/inceptionv3')
+vit_model = VisionTransformerModel()
+vit_explainer = GradCamExplainer(vit_model.model)
+lime_explainer = LimeExplainer(inceptionv3_model)
 segmentation = Segmentation()
 
 @app.route('/')
@@ -86,34 +29,88 @@ def index():
 def get_segmentation():
     ratio = float(request.args.get('ratio', 1.0))
     max_dist = float(request.args.get('max_dist', 10.0))
-
-    image_path = plt.imread('static/5.JPG')
-    
-    # Generate the segmentation results
-    segments = segmentation.apply_quickshift(image_path, ratio, max_dist)
-    
+    image_path = plt.imread('static/images/5.JPG')
+    segments = segmentation.apply_quickshift(image_path, ratio, max_dist)    
     segmentation_data = [segmentation.image_to_base64(segment) for segment in segments]
+
     return jsonify(segmentation_data)
 
 @app.route('/explain', methods=['POST'])
 def explain():
-    # Get the image data from the request
     image_data = request.files['image'].read()
+    model_type = request.form.get('model', 'vit')
+    explanation_images = []
+
+    if model_type == 'vit':
+        image = Image.open(io.BytesIO(image_data)).convert('RGB')
+        input_tensor = vit_transform(image).unsqueeze(0)
+        top_classes, top_probs = vit_model.predict(input_tensor)
+        
+        for cls in top_classes:
+            explanation = vit_explainer.explain(input_tensor, cls)
+            fig, ax = plt.subplots()
+            ax.imshow(explanation)
+            ax.axis('off')
+            buffer = io.BytesIO()
+            plt.savefig(buffer, format='png', bbox_inches='tight')
+            explanation_image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            plt.close(fig)
+            explanation_images.append(explanation_image_base64)
+
+    elif model_type == 'inception':
+        raw_img = inceptionv3_model.load_image(image_data)
+        img = inceptionv3_model.transform_img(raw_img)
+        top_classes, top_probs = inceptionv3_model.predict(img)
+
+        num_features = int(request.form.get('num_features', 5))
+        positive_only = request.form.get('positive_only', 'false') == 'true'
+        hide_rest = request.form.get('hide_rest', 'false') == 'true'
+
+        for _ in top_classes:
+            # explanation = lime_explainer.explain(img)
+            _, explanation = lime_explainer.explain(img, num_features, positive_only, hide_rest)
+            buffer = io.BytesIO()
+            plt.imsave(buffer, explanation, format='png')
+            explanation_image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            explanation_images.append(explanation_image_base64)
+            # predicted_class, explanation_image = explainer.explain(img)
+            # explanation_image_base64 = segmentation.image_to_base64(explanation_image)
+            # processed_image_path = 'static/images/explanation.png'
+            # plt.imsave(processed_image_path, explanation_image, format='png')
     
-    # Load the image
-    img = inceptionv3_model.load_image(image_data)
-    # Preprocess the image
+    else:
+        return jsonify({'error': 'Unsupported model selected'}), 400
+    
+    print('Top classes:', top_classes)
+    print('Top probabilities:', top_probs)
+
+    return jsonify({
+        'top_classes': [int(cls) for cls in top_classes],
+        'top_probs': [float(p) for p in top_probs],
+        'explanations': explanation_images
+    })
+
+@app.route('/adjust_parameters', methods=['POST'])
+def adjust_parameters():
+    num_features = int(request.form['num_features'])
+    positive_only = request.form.get('positive_only') == 'true'
+    hide_rest = request.form.get('hide_rest') == 'true'
+
+    # Re-explain with adjusted parameters
+    img = inceptionv3_model.load_image(open('static/images/5.JPG', "rb").read())
     img = inceptionv3_model.transform_img(img)
 
-    predicted_class, explanation_image = explainer.explain(img)
+    # Generate a new explanation with adjusted parameters
+    predicted_class, new_explanation_image = lime_explainer.explain(img, num_features, positive_only, hide_rest)
 
-    # Convert the explanation image to base64
-    buffer = io.BytesIO()
-    plt.imsave(buffer, explanation_image, format='png')
-    explanation_image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    # Save the adjusted image
+    new_image_path = 'static/images/new_explanation.png'
+    plt.imsave(new_image_path, new_explanation_image, format='png')
+
+    new_explanation_image_base64 = segmentation.image_to_base64(new_explanation_image)
     
     # Return the predicted class and explanation image as a JSON response
-    return jsonify({'predicted_class': str(predicted_class), 'explanation_image': explanation_image_base64})
+    return jsonify({'new_explanation_image': new_explanation_image_base64})
 
 if __name__ == '__main__':
     app.run(debug=True)
